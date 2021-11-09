@@ -29,3 +29,15 @@ plt.show()
 
 # ! The SAT of the student which attended to more than 75% of the classes were 0.2226 higher than
 #! the gpa of students which not attended.
+
+# ? Creating a data frame base on two students SAT scores;
+new_data = pd.DataFrame({'const':1, 'SAT':[1700,1670], 'Attendance':[0,1]})
+new_data = new_data[['const', 'SAT', 'Attendance']]
+
+#! Creating predictions about the students;
+predictions = result.predict(new_data)
+
+#! Creating another data frame;
+predictionsdf = pd.DataFrame({'Predictions':predictions})
+joined = new_data.join(predictionsdf)
+joined.rename(index={0:'Bob', 1:'Alice'})
