@@ -5,6 +5,7 @@ import seaborn as sns
 sns.set()
 from sklearn.linear_model import LinearRegression
 from sklearn.feature_selection import f_regression
+from sklearn.preprocessing import StandardScaler
 
 def adj_r2(x,y): # ? A function that returns the adjusted r_squared based on two data variables;
     r2 = reg.score(x,y)
@@ -38,4 +39,31 @@ f_regression(x,y) # ? F_regression is a method that creates individual feature r
 # ? usefulness.
 
 p_values = f_regression(x,y)[1]
-p_values.round(3) # ? Output:array([0.   , 0.676]), that way random variable is noticeably unuseful.
+p_values = p_values.round(3) # ? Output:array([0.   , 0.676]), that way random variable is noticeably unuseful.
+
+#! Creating a summary table with the important files;
+
+reg_summary = pd.DataFrame(data=x.columns.values, columns=['Features'])
+reg_summary ['Coefficients'] = reg.coef_
+reg_summary ['P-values'] = p_values
+
+scaler = StandardScaler()
+scaler.fit(x) # ? Preparing the scaler mechanism, basically obtaining the mean and standard deviation for future use.
+x_scaled = scaler.transform(x) # ? Applying the standardization method to the data base;
+
+reg_2 = LinearRegression()
+reg_2.fit(x_scaled,y)
+
+reg_2_summary = pd.DataFrame([['Intercept'],['SAT'],['Rand 1,2,3']], columns=['Features']) # ?  Intercept is also called bias;
+reg_2_summary['Weights'] = reg_2.intercept_, reg_2.coef_[0], reg_2.coef_[1]
+
+new_data = pd.DataFrame(data=[[1700,2],[1800,1]],columns=['SAT','Rand 1,2,3']) # ? Creating a new data frame to predict a certain SAT;
+
+reg_2.predict(new_data) # ?  This will generate a wrong info because the database is standardized and the expected output isn't;
+
+new_data_scaled = scaler.transform(new_data) # ? Transforming the new database into a scaled one;
+reg_2.predict(new_data_scaled)
+reg_simples = LinearRegression()
+x_simple_matrix = x_scaled[:,0].reshape(-1,1)
+reg_simples.fit(x_simple_matrix,y)
+reg_simples.predict(new_data_scaled[:,0].reshape(-1,1))
